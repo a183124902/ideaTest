@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-3.1.1.min.js"></script>
+    <script src="../js/bootstrap3/js/bootstrap.min.js"></script>
+    <script src="../js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+
+    <script src="../js/bootStrap-addTabs/bootstrap.addtabs.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="../js/bootstrap3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../js/bootStrap-addTabs/bootstrap.addtabs.css">
+    <link rel="stylesheet" href="../js/bootstrap-treeview/bootstrap-treeview.min.css">
+
+
+    <script src="../js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <link rel="stylesheet" href="../js/bootstrap-table/bootstrap-table.css">
+
+
+    <script src="../js/bootstrap-bootbox/bootbox.js"></script>
+
+    <script src="../js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="../js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="../js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css">
+
+
+
+    <style type="text/css">
+        .row {
+
+            padding-bottom: 15px
+
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">
+                    <p>金科教育</p>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-2">
+            <div id="myTree"></div>
+        </div>
+        <div class="col-md-10">
+
+            <div id="myTabs">
+                <!-- 新选项卡 -->
+                <ul class="nav nav-tabs" id="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#home" role="tab" data-toggle="tab">欢迎</a>
+                    </li>
+                </ul>
+
+                <!-- 选项卡下内容 -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+
+                        <div class="jumbotron">
+                            <h1>1904A</h1>
+                            <p>一组个人主页</p>
+                            <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+                            <button type="button" onclick="Logout()" class="btn btn-warning btn-sm">注销</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+
+
+
+    $(document).ready(function () {
+        initTreeView();
+    });
+
+    Logout = function(){
+
+        $.ajax({
+
+            url: "/logout",
+            success:function () {
+                location.href="/page/toLogin"
+            }
+
+            })
+    }
+    initTreeView = function () {
+
+        $.ajax({
+
+            url: "/student/initTreeView",
+            success: function (data) {
+
+                $('#myTree').treeview({
+                    data: data,
+                    icon: "glyphicon glyphicon-stop",
+                    color: "#000000",
+                    backColor: "#FFFFFF",
+                    //selectable:true,
+                    onNodeSelected: function (event, node) {
+
+
+                        $.addtabs.add({
+                            id: node.id,
+                            title: node.text,
+                            url:node.url
+                        });
+
+
+                    }
+                })
+
+            }
+
+        })
+
+
+    }
+
+
+</script>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/js/jquery-3.1.1.min.js"></script>
+    <script src="/js/bootstrap3/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+
+    <script src="/js/bootStrap-addTabs/bootstrap.addtabs.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="/js/bootstrap3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/js/bootStrap-addTabs/bootstrap.addtabs.css">
+    <link rel="stylesheet" href="/js/bootstrap-treeview/bootstrap-treeview.min.css">
+
+
+    <script src="/js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="/js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <link rel="stylesheet" href="/js/bootstrap-table/bootstrap-table.css">
+
+
+    <script src="/js/bootstrap-bootbox/bootbox.js"></script>
+
+    <script src="/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="/js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="/js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css">
+
+
+    <style type="text/css">
+        .row {
+
+            padding-bottom: 15px
+
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div id="toolbar">
+
+
+   <!-- <shiro:hasPermission name="student:initTable">
+
+        <button type="button" class="btn btn-sm btn-outline grey-salsa" >修改</button>
+
+    </shiro:hasPermission>
+
+    <a shiro:hasPermission="student:exportExcel" href="../student/exportExcel?filename=用户表格.xls" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">导出</a>
+    <a shiro:hasPermission="student:importExcel" href="javascript:openUserExcel()" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">导入</a>-->
+    <button type="button" onclick="addUser()" class="btn btn-warning btn-sm"><i class="glyphicon glyphicon-plus"></i>新增
+    </button>
+</div>
+<table class="table" id="myTable" style="height:10px"></table>
+</body>
+<script>
+
+
+    $(document).ready(function () {
+        initTable()
+    });
+
+    findData = function () {
+
+        $('#myTable').bootstrapTable('refresh', {
+            query: {
+
+                page: 1
+            }
+
+
+        })
+
+    }
+
+    //操作按钮权限控制
+    function getPermission ( data) {
+        var str='';
+
+
+        return str;
+    }
+
+    openUserExcel = function () {
+
+        bootbox.dialog({
+
+            title: '导入文件',
+            message: createAddContent("/student/toAdd1"),
+            closeButton: true,
+            buttons: {
+
+
+                "success": {
+
+                    "label": "<i class='icon-ok'></i>保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+
+
+
+                        var formdata = new FormData($("#excelForm")[0]);
+
+                        $.ajax({
+                            url: '/student/importExcel',
+                            type: 'post',
+                            data: formdata,
+                            dataType: "json",
+                            processData: false,  // 告诉jQuery不要去处理发送的数据
+                            contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                            success: function () {
+                                alert("成功")
+                            }
+                        });
+
+                    }
+                },
+                "cancle": {
+
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+
+                    }
+
+                }
+            }
+        })
+
+    }
+
+    function initTable() {
+
+
+        $('#myTable').bootstrapTable({
+
+            url: '/user/query',//获取数据地址
+            method: 'POST',                      //请求方式（*）
+            contentType: 'application/x-www-form-urlencoded',//post请求按照表单方式
+            columns: [
+                {checkbox: true},
+                {field: 'id', title: 'ID', align: 'center', width: 150},
+                {field: 'name', title: '姓名', align: 'center', width: 150},
+                {field: 'age', title: '性别', align: 'center', width: 150},
+                {field:'xx',title:'操作',formatter:function(value,row,index){
+                        return "<button class='btn btn-primary' onclick='queryUserById("+row.id+")'>修改</button>";
+                    }}
+
+            ],
+            toolbar: '#toolbar',              //工具按钮用哪个容器
+            striped: true,                      //是否显示行间隔色
+            cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,                   //是否显示分页（*）
+            sortable: true,                     //是否启用排序
+            sortOrder: "asc",                   //排序方式
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber: 1,                      //初始化加载第一页，默认第一页,并记录
+            pageSize: 2,                     //每页的记录行数（*）
+            pageList: [2, 4, 6, 8],        //可供选择的每页的行数（*）
+            search: false,                      //是否显示表格搜索
+            //strictSearch: true,
+            // showColumns: true,                  //是否显示所有的列（选择显示的列）
+            showRefresh: true,                  //是否显示刷新按钮
+            // minimumCountColumns: 2,             //最少允许的列数
+            clickToSelect: true,                //是否启用点击选中行
+            //height: 500,                      //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+            //uniqueId: "ID",                     //每一行的唯一标识，一般为主键列
+            showToggle: true,                   //是否显示详细视图和列表视图的切换按钮
+            cardView: false,                    //是否显示详细视图
+            detailView: false,                  //是否显示父子表
+            queryParams: function (params) {
+                //var searchEndPrice = $('#searchEndPrice').val();
+                //var searchBrand = $('#searchBrand').val();
+                return {
+                    //page: this.pageNumber,
+                    rows: params.limit,                         //页面大小
+                    page: (params.offset / params.limit) + 1
+
+                    //'goodsBean.name':searchGoodsName,
+                    //'goodsBean.searchStartTime':searchStartTime,
+                    //'goodsBean.searchEndTime':searchEndTime,
+                    //'goodsBean.searchStartPrice':searchStartPrice,
+                    //'goodsBean.searchEndPrice':searchEndPrice,
+                    //'goodsBean.brandId':searchBrand
+                };
+            }
+
+        });
+
+
+    }
+
+
+    queryUserById= function (id) {
+
+        bootbox.dialog({
+
+            title: '修改学生',
+            message: createAddContent("/user/toUpdate?id="+id),
+            closeButton: true,
+            buttons: {
+
+
+                "success": {
+
+                    "label": "<i class='icon-ok'></i>保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+
+                        $.ajax({
+                            url: '/user/addBook',
+                            type: 'post',
+                            data: $("#upForm").serialize(),
+                            success: function () {
+                                //刷新表格
+                                //$('#myTable').bootstrapTable('refresh');
+                                findData();
+                            }
+                        });
+
+                    }
+                },
+                "cancle": {
+
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+
+                    }
+
+                }
+            }
+        })
+
+    }
+
+
+    addUser = function () {
+
+        bootbox.dialog({
+
+            title: '新增学生',
+            message: createAddContent("/user/toAdd"),
+            closeButton: true,
+            buttons: {
+
+
+                "success": {
+
+                    "label": "<i class='icon-ok'></i>保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+
+                        $.ajax({
+                            url: '/user/addBook',
+                            type: 'post',
+                            data: $("#myForm").serialize(),
+                            success: function () {
+                                //刷新表格
+                                //$('#myTable').bootstrapTable('refresh');
+                                findData();
+                            }
+                        });
+
+                    }
+                },
+                "cancle": {
+
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+
+                    }
+
+                }
+            }
+        })
+
+    }
+
+
+    var res;
+
+    function createAddContent(url) {
+        $.ajax({
+            url: url,
+            async: false,//同步
+            success: function (data) {
+                res = data;
+            }
+        });
+        return res;
+    }
+
+
+</script>
+
+</html>

@@ -1,0 +1,28 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: zuul
+
+eureka:
+  client:
+    #eureka服务地址
+    service-url:
+      defaultZone: http://localhost:8080/eureka
+
+zuul:
+  routes:
+    api-a:
+    path: /api-a/**
+    serviceId: client-ribbon
+    api-b:
+      path: /user/**
+      serviceId: client-feign
+
+  #忽略的服务
+  ignored-services: client-ribbon
+
+  #还可以设置一个被路由忽略的表达式，也就是不被路由
+  #ignored-patterns: /**/hello/**
+

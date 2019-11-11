@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/js/jquery-3.1.1.min.js"></script>
+    <script src="/js/bootstrap3/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+
+    <script src="/js/bootStrap-addTabs/bootstrap.addtabs.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="/js/bootstrap3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/js/bootStrap-addTabs/bootstrap.addtabs.css">
+    <link rel="stylesheet" href="/js/bootstrap-treeview/bootstrap-treeview.min.css">
+
+
+    <script src="/js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="/js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <link rel="stylesheet" href="/js/bootstrap-table/bootstrap-table.css">
+
+
+    <script src="/js/bootstrap-bootbox/bootbox.js"></script>
+
+    <script src="/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="/js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="/js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css">
+
+
+    <style type="text/css">
+        .row {
+
+            padding-bottom: 15px
+
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div class="row">
+    <div class="col-md-5">
+        <div id="toolbar">
+
+            <button type="button" onclick="Empowerment()" class="btn btn-warning btn-sm"><i
+                    class="glyphicon glyphicon-plus"></i>赋权
+            </button>
+        </div>
+        <table class="table" id="myRoleTable" style="height:10px"></table>
+    </div>
+    <div class="col-md-2">
+        <div id="myPowTree"></div>
+    </div>
+    <div class="col-md-5">
+
+    </div>
+</div>
+
+</body>
+<script>
+
+
+    $(document).ready(function () {
+        initMyRoleTable();
+        initPowTreeView(-1);
+
+
+    });
+
+    Empowerment = function () {
+
+        var row = $("#myRoleTable").bootstrapTable('getSelections');
+
+        if (row.length != 1) {
+
+            bootbox.alert({
+                size: "small",
+                title: "提示",
+                message: "请选中一条数据！",
+                buttons: {
+                    ok: {
+                        label: '确定',
+                        className: 'btn-success'
+                    }
+                },
+                callback: function () {
+                }
+            })
+
+        } else {
+
+
+            var id = row[0].roleId;
+            initPowTreeView(id);
+        }
+
+    }
+    initPowTreeView = function (id) {
+
+        $.ajax({
+
+            url: "/student/initPowTreeView",
+            type: "post",
+            data: {id: id},
+            success: function (data) {
+
+                $('#myPowTree').treeview({
+                    data: data,
+                    showCheckbox: true,
+                    icon: "glyphicon glyphicon-stop",
+                    multiSelect: true,    //多选
+                    color: "#000000",
+                    backColor: "#FFFFFF"
+
+                    //selectable:true,
+
+
+                });
+
+
+               var ids =  data[0].ids;
+                for (var i=0;i<=ids.length; i++){
+                    if (ids[i]==true ){
+                        $('#myPowTree').treeview('checkNode', [i, {silent: true}]);
+                    }
+                }
+               //
+               //     if (ids[i]!=null){
+
+
+
+                       //$('#myPowTree').treeview('checkNode', [4, {silent: true}]);
+
+                       // $('#myPowTree').treeview('checkNode', [2, {silent: true}]);
+                 /*  }
+
+               }*/
+
+    }
+
+
+        })
+
+
+    }
+
+
+    /*findData = function () {
+
+        $('#myTable').bootstrapTable('refresh', {
+            query: {
+
+                page: 1
+            }
+
+
+        })
+
+    }*/
+
+
+    function initMyRoleTable() {
+
+
+        $('#myRoleTable').bootstrapTable({
+
+            url: '/student/initMyRoleTable',//获取数据地址
+            method: 'POST',                      //请求方式（*）
+            contentType: 'application/x-www-form-urlencoded',//post请求按照表单方式
+            columns: [
+                {checkbox: true},
+                {field: 'roleId', title: 'ID', align: 'center', width: 150},
+                {field: 'roleName', title: '角色名', align: 'center', width: 150},
+                {field: 'info', title: '信息', align: 'center', width: 150},
+                {field: 'value', title: '值', align: 'center', width: 150}
+
+
+            ],
+            toolbar: '#toolbar',              //工具按钮用哪个容器
+            striped: true,                      //是否显示行间隔色
+            cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: false,                   //是否显示分页（*）
+            sortable: true,                     //是否启用排序
+            sortOrder: "asc",                   //排序方式
+            //sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            //pageNumber: 1,                      //初始化加载第一页，默认第一页,并记录
+            // pageSize: 2,                     //每页的记录行数（*）
+            //pageList: [2, 4, 6, 8],        //可供选择的每页的行数（*）
+            search: false,                      //是否显示表格搜索
+            //strictSearch: true,
+            // showColumns: true,                  //是否显示所有的列（选择显示的列）
+            showRefresh: true,                  //是否显示刷新按钮
+            // minimumCountColumns: 2,             //最少允许的列数
+            clickToSelect: true,                //是否启用点击选中行
+            //height: 500,                      //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+            //uniqueId: "ID",                     //每一行的唯一标识，一般为主键列
+            showToggle: true,                   //是否显示详细视图和列表视图的切换按钮
+            cardView: false,                    //是否显示详细视图
+            detailView: false,                  //是否显示父子表
+            queryParams: function (params) {
+                //var searchEndPrice = $('#searchEndPrice').val();
+                //var searchBrand = $('#searchBrand').val();
+                return {
+                    //page: this.pageNumber,
+                    //rows: params.limit                       //页面大小
+                    //page: (params.offset / params.limit) + 1
+
+                    //'goodsBean.name':searchGoodsName,
+                    //'goodsBean.searchStartTime':searchStartTime,
+                    //'goodsBean.searchEndTime':searchEndTime,
+                    //'goodsBean.searchStartPrice':searchStartPrice,
+                    //'goodsBean.searchEndPrice':searchEndPrice,
+                    //'goodsBean.brandId':searchBrand
+                };
+            }
+
+        });
+
+
+    }
+
+
+
+</script>
+
+</html>

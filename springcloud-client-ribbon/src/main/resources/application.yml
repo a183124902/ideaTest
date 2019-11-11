@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: client-ribbon
+  thymeleaf:
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8080/eureka
+ribbon:
+  ConnectTimeout: 20000
+  ReadTimeout: 20000
+zuul:
+  host:
+   socket-timeout-millis: 20000
+   connect-timeout-millis: 20000
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000
